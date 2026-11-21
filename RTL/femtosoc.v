@@ -24,6 +24,7 @@
 `include "DEVICES/HardwareConfig.v" // Constant registers to query hardware config.
 `include "DEVICES/hub75/hub75.v"
 `include "DEVICES/hub75/panel_memory.v"
+`include "DEVICES/hub75/panel_pwm.v"
 `include "DEVICES/hub75/scan_counter.v"
 `include "DEVICES/hub75/delay_unit.v"
 

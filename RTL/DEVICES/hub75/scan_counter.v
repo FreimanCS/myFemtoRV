@@ -1,4 +1,6 @@
-module scan_counter(
+module scan_counter #(
+  parameter COLOR_BITS = 4
+)(
     input  wire clk,
     input  wire rst,
 
@@ -24,11 +26,10 @@ module scan_counter(
             end
 
             if (col == 0) begin
-                addr_out <= scan_row - 5'd1;
+                addr_out <= scan_row;
             end
 
-            // Advance the image row only after scanning the final column.
-            if (col == 63) begin
+            if (col == 0) begin
                 scan_row <= scan_row + 1;
                 if (scan_row == 31) begin
                     scan_row <= 0;

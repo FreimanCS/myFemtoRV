@@ -1,17 +1,20 @@
-module panel_pwm(
-    input  wire [23:0] pix_top,
-    input  wire [23:0] pix_bottom,
-    input  wire [4:0]  pwm_level,
+module panel_pwm # (
+    parameter COLOR_BITS = 4
+)(
+    input  wire [(3*COLOR_BITS)-1:0] pix_top,
+    input  wire [(3*COLOR_BITS)-1:0] pix_bottom,
+    input  wire [COLOR_BITS-1:0] pwm_level,
     output wire r0, g0, b0,
     output wire r1, g1, b1
 );
 
-    wire [4:0] top_red    = pix_top[23:19];
-    wire [4:0] top_green  = pix_top[15:11];
-    wire [4:0] top_blue   = pix_top[7:3];
-    wire [4:0] bottom_red   = pix_bottom[23:19];
-    wire [4:0] bottom_green = pix_bottom[15:11];
-    wire [4:0] bottom_blue  = pix_bottom[7:3];
+    wire [COLOR_BITS-1:0] top_red    = pix_top[(3*COLOR_BITS)-1:2*COLOR_BITS];
+    wire [COLOR_BITS-1:0] top_green  = pix_top[(2*COLOR_BITS)-1:COLOR_BITS];
+    wire [COLOR_BITS-1:0] top_blue   = pix_top[COLOR_BITS - 1 : 0];
+
+    wire [COLOR_BITS-1:0] bottom_red    = pix_bottom[(3*COLOR_BITS)-1:2*COLOR_BITS];
+    wire [COLOR_BITS-1:0] bottom_green  = pix_bottom[(2*COLOR_BITS)-1:COLOR_BITS];
+    wire [COLOR_BITS-1:0] bottom_blue   = pix_bottom[COLOR_BITS - 1 : 0];
 
     assign r0 = (top_red > pwm_level);
     assign g0 = (top_green > pwm_level);

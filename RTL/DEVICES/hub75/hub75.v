@@ -23,7 +23,7 @@ module hub75 #(
 
 
   wire wr_en = sel_hub75 && wstrb; // Selection hub75
-  wire [1:0] wr_sel = wdata[31:30]; // Layer Selection 0 = GB, 1 SPRITE, 2 TEXT
+  wire [1:0] wr_sel = wdata[31:30]; // Layer Selection 0 = GB, 1 SPRITE
   wire [11:0] wr_addr = {wdata[29:18]}; // {x, y}
   wire [(3*COLOR_BITS)-1:0] wr_data = wdata[(3*COLOR_BITS)-1:0]; // Color
 
@@ -33,6 +33,7 @@ module hub75 #(
   wire [5:0] row_top;
   wire [5:0] row_bottom;
   wire [4:0] pwm_level;
+
   assign addr = display_row;
 
   scan_counter SC (
@@ -69,11 +70,12 @@ module hub75 #(
       .wr_data(wr_data)
   );
 
-`ifdef PWM
-  panel_pwm PWM (
+  panel_pwm #(
+    .COLOR_BITS(COLOR_BITS)
+  ) PWM (
       .pix_top(pix_top),
       .pix_bottom(pix_bottom),
-      .pwm_level(pwm_level),
+      .pwm_level(pwm_level[COLOR_BITS-1:0]),
       .r0(r0),
       .g0(g0),
       .b0(b0),
@@ -81,14 +83,6 @@ module hub75 #(
       .g1(g1),
       .b1(b1)
   );
-`else
-  assign r0 = pix_top[3*COLOR_BITS-1];
-  assign g0 = pix_top[2*COLOR_BITS-1];
-  assign b0 = pix_top[COLOR_BITS-1];
-  assign r1 = pix_bottom[3*COLOR_BITS-1];
-  assign g1 = pix_bottom[2*COLOR_BITS-1];
-  assign b1 = pix_bottom[COLOR_BITS-1];
-`endif
 
   delay_unit DU (
       .clk(clk),

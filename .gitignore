@@ -17,6 +17,7 @@
 *.rpt
 *.blif
 *.list
+*ccls*/
 FIRMWARE/firmware.txt
 FIRMWARE/TOOLCHAIN/
 TUTORIALS/

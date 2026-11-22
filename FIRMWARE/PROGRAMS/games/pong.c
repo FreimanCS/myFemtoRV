@@ -9,6 +9,7 @@
 #define BALL_SIZE 2
 #define POINTS_TO_WIN 11
 #define MAX_BALL_SPEED 2
+#define SERVE_DELAY_FRAMES 20
 
 #define LEFT_PADDLE_X 3
 #define RIGHT_PADDLE_X 59
@@ -26,6 +27,7 @@ static int ball_dx;
 static int ball_dy;
 static int ball_speed;
 static int rally_hits;
+static int serve_delay;
 static int left_score;
 static int right_score;
 static int game_over;
@@ -47,13 +49,14 @@ static int clamp_right_y(int y) {
   return y;
 }
 
-static void reset_ball(int direction) {
+static void serve_ball(int direction, int inherited_dy) {
   ball_x = (PONG_WIDTH - BALL_SIZE) / 2;
   ball_y = (PONG_HEIGHT - BALL_SIZE) / 2;
   ball_dx = direction;
-  ball_dy = 0;
+  ball_dy = inherited_dy;
   ball_speed = 1;
   rally_hits = 0;
+  serve_delay = SERVE_DELAY_FRAMES;
 }
 
 static void reset_match(void) {
@@ -62,7 +65,7 @@ static void reset_match(void) {
   game_over = 0;
   left_y = (PONG_HEIGHT - LEFT_PADDLE_HEIGHT) / 2;
   right_y = (PONG_HEIGHT - RIGHT_PADDLE_HEIGHT) / 2;
-  reset_ball(1);
+  serve_ball(1, 0);
   old_left_y = left_y;
   old_right_y = right_y;
   old_ball_x = ball_x;
@@ -131,6 +134,8 @@ static void accelerate_rally(void) {
 }
 
 static void score_point(int direction) {
+  int inherited_dy = ball_dy;
+
   if (direction < 0)
     left_score++;
   else
@@ -141,12 +146,17 @@ static void score_point(int direction) {
     return;
   }
 
-  reset_ball(direction);
+  serve_ball(direction, inherited_dy);
 }
 
 void pong_update(void) {
   if (game_over)
     return;
+
+  if (serve_delay > 0) {
+    serve_delay--;
+    return;
+  }
 
   old_right_y = right_y;
   move_cpu();
@@ -159,10 +169,12 @@ void pong_update(void) {
 
   if (ball_y <= 0) {
     ball_y = 0;
-    ball_dy = 1;
+    if (ball_dy < 0)
+      ball_dy = -ball_dy;
   } else if (ball_y >= PONG_HEIGHT - BALL_SIZE) {
     ball_y = PONG_HEIGHT - BALL_SIZE;
-    ball_dy = -1;
+    if (ball_dy > 0)
+      ball_dy = -ball_dy;
   }
 
   if (ball_dx < 0 && ball_x <= LEFT_PADDLE_X + PADDLE_WIDTH &&
@@ -206,21 +218,20 @@ void pong_render(void) {
     cleanLayer(LAYER_BG);
     cleanLayer(LAYER_SPRITE);
     draw_background(pong_scenario);
+    draw_asset(LAYER_SPRITE, LEFT_PADDLE_X, left_y,
+               PADDLE_WIDTH, LEFT_PADDLE_HEIGHT, pong_player1);
+    draw_asset(LAYER_SPRITE, RIGHT_PADDLE_X, right_y,
+               PADDLE_WIDTH, RIGHT_PADDLE_HEIGHT, pong_player2);
+    draw_asset(LAYER_SPRITE, ball_x, ball_y,
+               BALL_SIZE, BALL_SIZE, pong_ball);
     needs_full_render = 0;
   } else {
-    fill_rect(LAYER_SPRITE, LEFT_PADDLE_X, old_left_y,
-              PADDLE_WIDTH, LEFT_PADDLE_HEIGHT, TRANSPARENT);
-    fill_rect(LAYER_SPRITE, RIGHT_PADDLE_X, old_right_y,
-              PADDLE_WIDTH, RIGHT_PADDLE_HEIGHT, TRANSPARENT);
-    fill_rect(LAYER_SPRITE, old_ball_x, old_ball_y,
-              BALL_SIZE, BALL_SIZE, TRANSPARENT);
+    move_sprite(LEFT_PADDLE_X, old_left_y, LEFT_PADDLE_X, left_y,
+                PADDLE_WIDTH, LEFT_PADDLE_HEIGHT, pong_player1);
+    move_sprite(RIGHT_PADDLE_X, old_right_y, RIGHT_PADDLE_X, right_y,
+                PADDLE_WIDTH, RIGHT_PADDLE_HEIGHT, pong_player2);
+    move_sprite(old_ball_x, old_ball_y, ball_x, ball_y,
+                BALL_SIZE, BALL_SIZE, pong_ball);
   }
-
-  draw_asset(LAYER_SPRITE, LEFT_PADDLE_X, left_y,
-             PADDLE_WIDTH, LEFT_PADDLE_HEIGHT, pong_player1);
-  draw_asset(LAYER_SPRITE, RIGHT_PADDLE_X, right_y,
-             PADDLE_WIDTH, RIGHT_PADDLE_HEIGHT, pong_player2);
-  draw_asset(LAYER_SPRITE, ball_x, ball_y,
-             BALL_SIZE, BALL_SIZE, pong_ball);
   draw_score();
 }

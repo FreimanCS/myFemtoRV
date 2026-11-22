@@ -1,6 +1,5 @@
 #include "assets.h"
 #include "assets.c"
-#include "pong_assets.c"
 #include "games/pong.c"
 #include "games/pong.h"
 #include "../LIBFEMTORV32/keyboard.h"

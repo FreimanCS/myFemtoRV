@@ -1,6 +1,6 @@
 #pragma once
 #include "../include/hub75.h"
-#include "../pong_assets.h"
+#include "../assets.h"
 
 void pong_init(void);
 int pong_input(int key);

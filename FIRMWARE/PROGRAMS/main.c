@@ -124,7 +124,8 @@ int update_input(void) {
     case BTN_START:
       selectedMode = (GameMode)modeIndex;
       if (gameIndex == PONG)
-        pong_set_mode(selectedMode == MULTI);
+        /* LOCAL currently uses the same Pong path; FPGA link comes later. */
+        pong_set_mode(selectedMode != SINGLE);
       mode_bg_drawn = 0;
       game_inited = 0;
       screen = GAME;

@@ -8,6 +8,7 @@
 #define PADDLE_SPEED 2
 #define BALL_SIZE 2
 #define POINTS_TO_WIN 11
+#define MAX_BALL_SPEED 3
 #define SERVE_DELAY_FRAMES 20
 
 #define LEFT_PADDLE_X 3
@@ -131,7 +132,7 @@ static int bounce_angle(int paddle_y, int paddle_height) {
 
 static void accelerate_rally(void) {
   rally_hits++;
-  if (rally_hits % 3 == 0)
+  if (rally_hits % 3 == 0 && ball_speed < MAX_BALL_SPEED)
     ball_speed++;
 }
 

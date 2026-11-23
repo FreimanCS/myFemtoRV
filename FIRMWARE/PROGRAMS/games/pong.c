@@ -222,6 +222,10 @@ void pong_update(void) {
 
 int pong_tick(void) {
   pong_update();
+
+  /* Keep the game at roughly 60 frames per second without changing main.c. */
+  milliwait(16);
+
   if (game_over)
     return GAME_REQ_OVER;
   return GAME_DIRTY;

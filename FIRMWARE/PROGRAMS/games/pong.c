@@ -35,6 +35,7 @@ static int left_score;
 static int right_score;
 static int game_over;
 static int needs_full_render;
+static int multiplayer;
 
 static int clamp_left_y(int y) {
   if (y < 0)
@@ -76,6 +77,10 @@ static void reset_match(void) {
   needs_full_render = 1;
 }
 
+void pong_set_mode(int two_players) {
+  multiplayer = two_players != 0;
+}
+
 void pong_init(void) {
   cleanLayer(LAYER_BG);
   cleanLayer(LAYER_SPRITE);
@@ -83,7 +88,8 @@ void pong_init(void) {
 }
 
 int pong_input(int key) {
-  if (key == BTN_B)
+  if ((!multiplayer && key == BTN_B) ||
+      (multiplayer && key == BTN_SELECT))
     return -1;
 
   if (game_over && (key == BTN_A || key == BTN_START)) {
@@ -97,8 +103,13 @@ int pong_input(int key) {
   } else if (key == BTN_DOWN) {
     old_left_y = left_y;
     left_y = clamp_left_y(left_y + PADDLE_SPEED);
-  }
-  else
+  } else if (multiplayer && key == BTN_A) {
+    old_right_y = right_y;
+    right_y = clamp_right_y(right_y - PADDLE_SPEED);
+  } else if (multiplayer && key == BTN_B) {
+    old_right_y = right_y;
+    right_y = clamp_right_y(right_y + PADDLE_SPEED);
+  } else
     return 0;
 
   return 1;
@@ -166,7 +177,8 @@ void pong_update(void) {
   }
 
   old_right_y = right_y;
-  move_cpu();
+  if (!multiplayer)
+    move_cpu();
 
   old_ball_x = ball_x;
   old_ball_y = ball_y;

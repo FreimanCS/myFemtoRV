@@ -123,6 +123,8 @@ int update_input(void) {
     case BTN_A:
     case BTN_START:
       selectedMode = (GameMode)modeIndex;
+      if (gameIndex == PONG)
+        pong_set_mode(selectedMode == MULTI);
       mode_bg_drawn = 0;
       game_inited = 0;
       screen = GAME;

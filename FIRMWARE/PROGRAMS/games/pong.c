@@ -2,7 +2,7 @@
 
 #define PONG_WIDTH 64
 #define PONG_HEIGHT 64
-#define PADDLE_WIDTH 2
+#define PADDLE_WIDTH 1
 #define LEFT_PADDLE_HEIGHT 10
 #define RIGHT_PADDLE_HEIGHT 9
 #define PADDLE_SPEED 2
@@ -12,7 +12,7 @@
 #define SERVE_DELAY_FRAMES 20
 
 #define LEFT_PADDLE_X 3
-#define RIGHT_PADDLE_X 59
+#define RIGHT_PADDLE_X 60
 #define SCORE_LEFT_EDGE 27
 #define SCORE_RIGHT_X 37
 #define SCORE_Y 2

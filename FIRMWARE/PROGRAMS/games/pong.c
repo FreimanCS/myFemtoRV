@@ -13,7 +13,7 @@
 
 #define LEFT_PADDLE_X 3
 #define RIGHT_PADDLE_X 59
-#define SCORE_LEFT_X 19
+#define SCORE_LEFT_EDGE 27
 #define SCORE_RIGHT_X 37
 #define SCORE_Y 2
 #define SCORE_DIGIT_HEIGHT 9
@@ -211,6 +211,14 @@ static const uint16_t * const score_digits[10] = {
 
 static const int score_widths[10] = {6, 1, 6, 6, 6, 6, 6, 6, 6, 6};
 
+static int score_number_width(int score) {
+  int units = score % 10;
+
+  if (score >= 10)
+    return score_widths[score / 10] + 1 + score_widths[units];
+  return score_widths[units];
+}
+
 static void draw_score_number(int score, int x) {
   int tens = score / 10;
   int units = score % 10;
@@ -226,9 +234,11 @@ static void draw_score_number(int score, int x) {
 }
 
 static void draw_score(void) {
+  int left_x = SCORE_LEFT_EDGE - score_number_width(left_score);
+
   fill_rect(LAYER_SPRITE, 15, SCORE_Y, 34, SCORE_DIGIT_HEIGHT,
             TRANSPARENT);
-  draw_score_number(left_score, SCORE_LEFT_X);
+  draw_score_number(left_score, left_x);
   draw_score_number(right_score, SCORE_RIGHT_X);
 }
 

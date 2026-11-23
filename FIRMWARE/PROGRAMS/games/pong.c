@@ -217,21 +217,21 @@ void pong_render(void) {
   if (needs_full_render) {
     cleanLayer(LAYER_BG);
     cleanLayer(LAYER_SPRITE);
-    draw_background(pong_scenario);
+    draw_background(PongScenario);
     draw_asset(LAYER_SPRITE, LEFT_PADDLE_X, left_y,
-               PADDLE_WIDTH, LEFT_PADDLE_HEIGHT, pong_player1);
+               PADDLE_WIDTH, LEFT_PADDLE_HEIGHT, PongPlayer1);
     draw_asset(LAYER_SPRITE, RIGHT_PADDLE_X, right_y,
-               PADDLE_WIDTH, RIGHT_PADDLE_HEIGHT, pong_player2);
+               PADDLE_WIDTH, RIGHT_PADDLE_HEIGHT, PongPlayer2);
     draw_asset(LAYER_SPRITE, ball_x, ball_y,
-               BALL_SIZE, BALL_SIZE, pong_ball);
+               BALL_SIZE, BALL_SIZE, PongBall);
     needs_full_render = 0;
   } else {
     move_sprite(LEFT_PADDLE_X, old_left_y, LEFT_PADDLE_X, left_y,
-                PADDLE_WIDTH, LEFT_PADDLE_HEIGHT, pong_player1);
+                PADDLE_WIDTH, LEFT_PADDLE_HEIGHT, PongPlayer1);
     move_sprite(RIGHT_PADDLE_X, old_right_y, RIGHT_PADDLE_X, right_y,
-                PADDLE_WIDTH, RIGHT_PADDLE_HEIGHT, pong_player2);
+                PADDLE_WIDTH, RIGHT_PADDLE_HEIGHT, PongPlayer2);
     move_sprite(old_ball_x, old_ball_y, ball_x, ball_y,
-                BALL_SIZE, BALL_SIZE, pong_ball);
+                BALL_SIZE, BALL_SIZE, PongBall);
   }
   draw_score();
 }

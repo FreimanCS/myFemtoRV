@@ -90,14 +90,16 @@ int pong_input(int key) {
     return GAME_EXIT_MODE;
 
   if (key == BTN_UP) {
-    old_paddle_y = paddle_y;
-    paddle_y = clamp_paddle_y(paddle_y - PADDLE_SPEED);
+    paddle_y -= PADDLE_SPEED;
+    if (paddle_y < 0)
+      paddle_y = 0;
     return GAME_DIRTY;
   }
 
   if (key == BTN_DOWN) {
-    old_paddle_y = paddle_y;
-    paddle_y = clamp_paddle_y(paddle_y + PADDLE_SPEED);
+    paddle_y += PADDLE_SPEED;
+    if (paddle_y > PONG_HEIGHT - LEFT_PADDLE_HEIGHT)
+      paddle_y = PONG_HEIGHT - LEFT_PADDLE_HEIGHT;
     return GAME_DIRTY;
   }
 
@@ -287,17 +289,25 @@ void pong_render(void) {
                BALL_SIZE, BALL_SIZE, PongBall);
     needs_full_render = 0;
   } else {
-    move_sprite(LEFT_PADDLE_X, old_paddle_y, LEFT_PADDLE_X, paddle_y,
-                PADDLE_WIDTH, LEFT_PADDLE_HEIGHT, PongPlayer1);
-    move_sprite(RIGHT_PADDLE_X, old_right_y, RIGHT_PADDLE_X, right_y,
-                PADDLE_WIDTH, RIGHT_PADDLE_HEIGHT, PongPlayer2);
-    move_sprite(old_ball_x, old_ball_y, ball_x, ball_y,
-                BALL_SIZE, BALL_SIZE, PongBall);
+    if (old_paddle_y != paddle_y) {
+      move_sprite(LEFT_PADDLE_X, old_paddle_y, LEFT_PADDLE_X, paddle_y,
+                  PADDLE_WIDTH, LEFT_PADDLE_HEIGHT, PongPlayer1);
+      old_paddle_y = paddle_y;
+    }
+
+    if (old_right_y != right_y) {
+      move_sprite(RIGHT_PADDLE_X, old_right_y, RIGHT_PADDLE_X, right_y,
+                  PADDLE_WIDTH, RIGHT_PADDLE_HEIGHT, PongPlayer2);
+      old_right_y = right_y;
+    }
+
+    if (old_ball_x != ball_x || old_ball_y != ball_y) {
+      move_sprite(old_ball_x, old_ball_y, ball_x, ball_y,
+                  BALL_SIZE, BALL_SIZE, PongBall);
+      old_ball_x = ball_x;
+      old_ball_y = ball_y;
+    }
   }
 
-  old_paddle_y = paddle_y;
-  old_right_y = right_y;
-  old_ball_x = ball_x;
-  old_ball_y = ball_y;
   draw_score();
 }

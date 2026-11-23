@@ -2,17 +2,16 @@
 
 #define PONG_WIDTH 64
 #define PONG_HEIGHT 64
-#define PADDLE_WIDTH 1
+#define PADDLE_WIDTH 2
 #define LEFT_PADDLE_HEIGHT 10
 #define RIGHT_PADDLE_HEIGHT 9
 #define PADDLE_SPEED 2
 #define BALL_SIZE 2
 #define POINTS_TO_WIN 11
-#define MAX_BALL_SPEED 2
 #define SERVE_DELAY_FRAMES 20
 
 #define LEFT_PADDLE_X 3
-#define RIGHT_PADDLE_X 60
+#define RIGHT_PADDLE_X 59
 #define SCORE_LEFT_EDGE 27
 #define SCORE_RIGHT_X 37
 #define SCORE_Y 2
@@ -119,7 +118,7 @@ static int overlaps_vertical(int y1, int h1, int y2, int h2) {
 }
 
 static int bounce_angle(int paddle_y, int paddle_height) {
-  static const int angle_by_zone[8] = {-2, -1, -1, 0, 0, 1, 1, 2};
+  static const int angle_by_zone[8] = {-2, -1, -1, 0, 1, 1, 2, 2};
   int relative_y = (ball_y + BALL_SIZE / 2) - paddle_y;
   int zone = (relative_y * 8) / paddle_height;
 
@@ -132,7 +131,7 @@ static int bounce_angle(int paddle_y, int paddle_height) {
 
 static void accelerate_rally(void) {
   rally_hits++;
-  if (rally_hits % 3 == 0 && ball_speed < MAX_BALL_SPEED)
+  if (rally_hits % 3 == 0)
     ball_speed++;
 }
 

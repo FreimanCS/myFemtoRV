@@ -18,9 +18,9 @@
 #define SCORE_Y 2
 #define SCORE_DIGIT_HEIGHT 9
 
-static int left_y;
+static int paddle_y;
 static int right_y;
-static int old_left_y;
+static int old_paddle_y;
 static int old_right_y;
 static int ball_x;
 static int ball_y;
@@ -37,7 +37,7 @@ static int game_over;
 static int needs_full_render;
 static GameMode pong_mode;
 
-static int clamp_left_y(int y) {
+static int clamp_paddle_y(int y) {
   if (y < 0)
     return 0;
   if (y > PONG_HEIGHT - LEFT_PADDLE_HEIGHT)
@@ -67,10 +67,10 @@ static void reset_match(void) {
   left_score = 0;
   right_score = 0;
   game_over = 0;
-  left_y = (PONG_HEIGHT - LEFT_PADDLE_HEIGHT) / 2;
+  paddle_y = (PONG_HEIGHT - LEFT_PADDLE_HEIGHT) / 2;
   right_y = (PONG_HEIGHT - RIGHT_PADDLE_HEIGHT) / 2;
   serve_ball(1, 0);
-  old_left_y = left_y;
+  old_paddle_y = paddle_y;
   old_right_y = right_y;
   old_ball_x = ball_x;
   old_ball_y = ball_y;
@@ -98,17 +98,11 @@ int pong_input(int key) {
   }
 
   if (key == BTN_UP) {
-    old_left_y = left_y;
-    left_y = clamp_left_y(left_y - PADDLE_SPEED);
+    old_paddle_y = paddle_y;
+    paddle_y = clamp_paddle_y(paddle_y - PADDLE_SPEED);
   } else if (key == BTN_DOWN) {
-    old_left_y = left_y;
-    left_y = clamp_left_y(left_y + PADDLE_SPEED);
-  } else if (pong_mode != SINGLE && key == BTN_LEFT) {
-    old_right_y = right_y;
-    right_y = clamp_right_y(right_y - PADDLE_SPEED);
-  } else if (pong_mode != SINGLE && key == BTN_RIGHT) {
-    old_right_y = right_y;
-    right_y = clamp_right_y(right_y + PADDLE_SPEED);
+    old_paddle_y = paddle_y;
+    paddle_y = clamp_paddle_y(paddle_y + PADDLE_SPEED);
   } else
     return 0;
 
@@ -199,10 +193,10 @@ void pong_update(void) {
 
   if (ball_dx < 0 && ball_x <= LEFT_PADDLE_X + PADDLE_WIDTH &&
       ball_x + BALL_SIZE >= LEFT_PADDLE_X &&
-      overlaps_vertical(ball_y, BALL_SIZE, left_y, LEFT_PADDLE_HEIGHT)) {
+      overlaps_vertical(ball_y, BALL_SIZE, paddle_y, LEFT_PADDLE_HEIGHT)) {
     ball_x = LEFT_PADDLE_X + PADDLE_WIDTH;
     ball_dx = 1;
-    ball_dy = bounce_angle(left_y, LEFT_PADDLE_HEIGHT);
+    ball_dy = bounce_angle(paddle_y, LEFT_PADDLE_HEIGHT);
     accelerate_rally();
   }
 
@@ -287,7 +281,7 @@ void pong_render(void) {
     cleanLayer(LAYER_BG);
     cleanLayer(LAYER_SPRITE);
     draw_background(PongScenario);
-    draw_asset(LAYER_SPRITE, LEFT_PADDLE_X, left_y,
+    draw_asset(LAYER_SPRITE, LEFT_PADDLE_X, paddle_y,
                PADDLE_WIDTH, LEFT_PADDLE_HEIGHT, PongPlayer1);
     draw_asset(LAYER_SPRITE, RIGHT_PADDLE_X, right_y,
                PADDLE_WIDTH, RIGHT_PADDLE_HEIGHT, PongPlayer2);
@@ -295,7 +289,7 @@ void pong_render(void) {
                BALL_SIZE, BALL_SIZE, PongBall);
     needs_full_render = 0;
   } else {
-    move_sprite(LEFT_PADDLE_X, old_left_y, LEFT_PADDLE_X, left_y,
+    move_sprite(LEFT_PADDLE_X, old_paddle_y, LEFT_PADDLE_X, paddle_y,
                 PADDLE_WIDTH, LEFT_PADDLE_HEIGHT, PongPlayer1);
     move_sprite(RIGHT_PADDLE_X, old_right_y, RIGHT_PADDLE_X, right_y,
                 PADDLE_WIDTH, RIGHT_PADDLE_HEIGHT, PongPlayer2);
@@ -303,7 +297,7 @@ void pong_render(void) {
                 BALL_SIZE, BALL_SIZE, PongBall);
   }
 
-  old_left_y = left_y;
+  old_paddle_y = paddle_y;
   old_right_y = right_y;
   old_ball_x = ball_x;
   old_ball_y = ball_y;

@@ -13,7 +13,10 @@
 
 #define LEFT_PADDLE_X 3
 #define RIGHT_PADDLE_X 59
+#define SCORE_LEFT_X 19
+#define SCORE_RIGHT_X 37
 #define SCORE_Y 2
+#define SCORE_DIGIT_HEIGHT 9
 
 static int left_y;
 static int right_y;
@@ -201,16 +204,32 @@ void pong_update(void) {
     score_point(-1);
 }
 
+static const uint16_t * const score_digits[10] = {
+    Num0, Num1, Num2, Num3, Num4,
+    Num5, Num6, Num7, Num8, Num9,
+};
+
+static const int score_widths[10] = {6, 1, 6, 6, 6, 6, 6, 6, 6, 6};
+
+static void draw_score_number(int score, int x) {
+  int tens = score / 10;
+  int units = score % 10;
+
+  if (score >= 10) {
+    draw_asset(LAYER_SPRITE, x, SCORE_Y, score_widths[tens],
+               SCORE_DIGIT_HEIGHT, score_digits[tens]);
+    x += score_widths[tens] + 1;
+  }
+
+  draw_asset(LAYER_SPRITE, x, SCORE_Y, score_widths[units],
+             SCORE_DIGIT_HEIGHT, score_digits[units]);
+}
+
 static void draw_score(void) {
-  int i;
-
-  fill_rect(LAYER_SPRITE, 8, SCORE_Y, 16, 4, TRANSPARENT);
-  fill_rect(LAYER_SPRITE, 40, SCORE_Y, 16, 4, TRANSPARENT);
-
-  for (i = 0; i < left_score; i++)
-    fill_rect(LAYER_SPRITE, 8 + i * 2, SCORE_Y, 1, 2, COLOR_CYAN);
-  for (i = 0; i < right_score; i++)
-    fill_rect(LAYER_SPRITE, 40 + i * 2, SCORE_Y, 1, 2, COLOR_RED);
+  fill_rect(LAYER_SPRITE, 15, SCORE_Y, 34, SCORE_DIGIT_HEIGHT,
+            TRANSPARENT);
+  draw_score_number(left_score, SCORE_LEFT_X);
+  draw_score_number(right_score, SCORE_RIGHT_X);
 }
 
 void pong_render(void) {

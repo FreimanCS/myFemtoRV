@@ -2,8 +2,9 @@
 #include "../include/hub75.h"
 #include "../pong_assets.h"
 
-void pong_set_mode(int multiplayer);
-void pong_init(void);
+void pong_init(GameMode mode);
 int pong_input(int key);
-void pong_update(void);
+int pong_tick(void);
 void pong_render(void);
+void pong_mode_menu(void);
+void pong_pause(void);

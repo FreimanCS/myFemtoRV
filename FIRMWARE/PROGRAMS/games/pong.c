@@ -77,17 +77,17 @@ static void reset_match(void) {
   needs_full_render = 1;
 }
 
-void pong_set_mode(int two_players) {
-  multiplayer = two_players != 0;
-}
-
-void pong_init(void) {
+void pong_init(GameMode mode) {
+  multiplayer = mode != SINGLE;
   cleanLayer(LAYER_BG);
   cleanLayer(LAYER_SPRITE);
   reset_match();
 }
 
 int pong_input(int key) {
+  if (key == BTN_START)
+    return GAME_REQ_PAUSE;
+
   if ((!multiplayer && key == BTN_B) ||
       (multiplayer && key == BTN_SELECT))
     return -1;
@@ -218,6 +218,25 @@ void pong_update(void) {
     score_point(1);
   else if (ball_x >= PONG_WIDTH)
     score_point(-1);
+}
+
+int pong_tick(void) {
+  pong_update();
+  if (game_over)
+    return GAME_REQ_OVER;
+  return GAME_DIRTY;
+}
+
+void pong_mode_menu(void) {
+  cleanLayer(LAYER_BG);
+  cleanLayer(LAYER_SPRITE);
+  draw_background(pongMenu);
+}
+
+void pong_pause(void) {
+  cleanLayer(LAYER_BG);
+  cleanLayer(LAYER_SPRITE);
+  draw_background(pongPause);
 }
 
 static const uint16_t * const score_digits[10] = {

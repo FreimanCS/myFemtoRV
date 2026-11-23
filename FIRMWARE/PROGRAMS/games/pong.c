@@ -35,7 +35,6 @@ static int left_score;
 static int right_score;
 static int game_over;
 static int needs_full_render;
-static int multiplayer;
 
 static int clamp_left_y(int y) {
   if (y < 0)
@@ -78,7 +77,8 @@ static void reset_match(void) {
 }
 
 void pong_init(GameMode mode) {
-  multiplayer = mode != SINGLE;
+  /* The second-FPGA input will replace this fallback later. */
+  (void)mode;
   cleanLayer(LAYER_BG);
   cleanLayer(LAYER_SPRITE);
   reset_match();
@@ -88,9 +88,9 @@ int pong_input(int key) {
   if (key == BTN_START)
     return GAME_REQ_PAUSE;
 
-  if ((!multiplayer && key == BTN_B) ||
-      (multiplayer && key == BTN_SELECT))
-    return -1;
+  /* B always returns to the previous menu; it is never a game control. */
+  if (key == BTN_B || key == BTN_SELECT)
+    return GAME_EXIT_MODE;
 
   if (game_over && (key == BTN_A || key == BTN_START)) {
     reset_match();
@@ -103,12 +103,6 @@ int pong_input(int key) {
   } else if (key == BTN_DOWN) {
     old_left_y = left_y;
     left_y = clamp_left_y(left_y + PADDLE_SPEED);
-  } else if (multiplayer && key == BTN_A) {
-    old_right_y = right_y;
-    right_y = clamp_right_y(right_y - PADDLE_SPEED);
-  } else if (multiplayer && key == BTN_B) {
-    old_right_y = right_y;
-    right_y = clamp_right_y(right_y + PADDLE_SPEED);
   } else
     return 0;
 
@@ -177,8 +171,8 @@ void pong_update(void) {
   }
 
   old_right_y = right_y;
-  if (!multiplayer)
-    move_cpu();
+  /* Temporary fallback until the second FPGA input is wired in. */
+  move_cpu();
 
   old_ball_x = ball_x;
   old_ball_y = ball_y;
@@ -301,5 +295,10 @@ void pong_render(void) {
     move_sprite(old_ball_x, old_ball_y, ball_x, ball_y,
                 BALL_SIZE, BALL_SIZE, PongBall);
   }
+
+  old_left_y = left_y;
+  old_right_y = right_y;
+  old_ball_x = ball_x;
+  old_ball_y = ball_y;
   draw_score();
 }

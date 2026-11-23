@@ -144,6 +144,10 @@ static void score_point(int direction) {
   else
     right_score++;
 
+  /* Every point starts the next rally at the slowest speed. */
+  ball_speed = 1;
+  rally_hits = 0;
+
   if (left_score >= POINTS_TO_WIN || right_score >= POINTS_TO_WIN) {
     game_over = 1;
     return;

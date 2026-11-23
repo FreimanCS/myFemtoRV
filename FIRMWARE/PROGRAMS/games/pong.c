@@ -35,6 +35,7 @@ static int left_score;
 static int right_score;
 static int game_over;
 static int needs_full_render;
+static GameMode pong_mode;
 
 static int clamp_left_y(int y) {
   if (y < 0)
@@ -77,8 +78,7 @@ static void reset_match(void) {
 }
 
 void pong_init(GameMode mode) {
-  /* The second-FPGA input will replace this fallback later. */
-  (void)mode;
+  pong_mode = mode;
   cleanLayer(LAYER_BG);
   cleanLayer(LAYER_SPRITE);
   reset_match();
@@ -171,8 +171,9 @@ void pong_update(void) {
   }
 
   old_right_y = right_y;
-  /* Temporary fallback until the second FPGA input is wired in. */
-  move_cpu();
+  /* Only SINGLE uses the CPU. MULTI/LOCAL wait for the second FPGA state. */
+  if (pong_mode == SINGLE)
+    move_cpu();
 
   old_ball_x = ball_x;
   old_ball_y = ball_y;

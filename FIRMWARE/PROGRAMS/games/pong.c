@@ -103,6 +103,12 @@ int pong_input(int key) {
   } else if (key == BTN_DOWN) {
     old_left_y = left_y;
     left_y = clamp_left_y(left_y + PADDLE_SPEED);
+  } else if (pong_mode != SINGLE && key == BTN_LEFT) {
+    old_right_y = right_y;
+    right_y = clamp_right_y(right_y - PADDLE_SPEED);
+  } else if (pong_mode != SINGLE && key == BTN_RIGHT) {
+    old_right_y = right_y;
+    right_y = clamp_right_y(right_y + PADDLE_SPEED);
   } else
     return 0;
 

@@ -85,28 +85,26 @@ void pong_init(GameMode mode) {
 }
 
 int pong_input(int key) {
-  if (key == BTN_START)
-    return GAME_REQ_PAUSE;
-
   /* B always returns to the previous menu; it is never a game control. */
-  if (key == BTN_B || key == BTN_SELECT)
+  if (key == BTN_B)
     return GAME_EXIT_MODE;
-
-  if (game_over && (key == BTN_A || key == BTN_START)) {
-    reset_match();
-    return 1;
-  }
 
   if (key == BTN_UP) {
     old_paddle_y = paddle_y;
     paddle_y = clamp_paddle_y(paddle_y - PADDLE_SPEED);
-  } else if (key == BTN_DOWN) {
+    return GAME_DIRTY;
+  }
+
+  if (key == BTN_DOWN) {
     old_paddle_y = paddle_y;
     paddle_y = clamp_paddle_y(paddle_y + PADDLE_SPEED);
-  } else
-    return 0;
+    return GAME_DIRTY;
+  }
 
-  return 1;
+  if (key == BTN_START)
+    return GAME_REQ_PAUSE;
+
+  return GAME_OK;
 }
 
 static void move_cpu(void) {

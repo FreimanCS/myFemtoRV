@@ -10,6 +10,7 @@
 #define POINTS_TO_WIN 11
 #define MAX_BALL_SPEED 3
 #define SERVE_DELAY_FRAMES 20
+#define TICKS_PER_STEP 4000U
 
 #define LEFT_PADDLE_X 3
 #define RIGHT_PADDLE_X 59
@@ -35,6 +36,7 @@ static int left_score;
 static int right_score;
 static int game_over;
 static int needs_full_render;
+static uint32_t frame_div;
 static GameMode pong_mode;
 
 static int clamp_paddle_y(int y) {
@@ -79,6 +81,7 @@ static void reset_match(void) {
 
 void pong_init(GameMode mode) {
   pong_mode = mode;
+  frame_div = 0;
   cleanLayer(LAYER_BG);
   cleanLayer(LAYER_SPRITE);
   reset_match();
@@ -216,10 +219,12 @@ void pong_update(void) {
 }
 
 int pong_tick(void) {
-  pong_update();
+  frame_div++;
+  if (frame_div < TICKS_PER_STEP)
+    return GAME_OK;
 
-  /* Keep the game at roughly 60 frames per second without changing main.c. */
-  milliwait(16);
+  frame_div = 0;
+  pong_update();
 
   if (game_over)
     return GAME_REQ_OVER;
